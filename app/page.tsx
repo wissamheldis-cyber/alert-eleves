@@ -115,7 +115,7 @@ export default function Home() {
               {/* Content Side */}
               <div className="space-y-10">
                 <div className="space-y-4">
-                  <h2 className="text-3xl md:text-4xl font-bold text-white">Pourquoi c'est dur ?</h2>
+                  <h2 className="text-3xl md:text-4xl font-bold text-white">Une réalité complexe</h2>
                   <p className="text-neutral-soft text-lg leading-relaxed">
                     Ce n'est pas juste "de la vapeur". C'est un mécanisme conçu pour créer une habitude immédiate, renforcée par le groupe et le stress du quotidien.
                   </p>
