@@ -50,7 +50,7 @@ export default function SchoolsPage() {
                                 </CardHeader>
                                 <CardContent className="flex-1 pt-8 space-y-4">
                                     {[
-                                        "30 exemplaires du livre Puff",
+                                        "10 exemplaires du livre Puff",
                                         "1 Guide pédagogique (PDF)",
                                         "3 Affiches prévention A3"
                                     ].map((item, i) => (
