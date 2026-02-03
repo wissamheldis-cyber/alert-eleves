@@ -47,15 +47,26 @@ export function SmartLoader() {
                 "fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background transition-all duration-1000 ease-in-out",
                 isTransitioning ? "opacity-0 blur-xl scale-105" : "opacity-100 blur-0 scale-100"
             )}
+            style={{
+                backgroundImage: "url('/images/inspiration_for_direction_artistic.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundBlendMode: "overlay"
+            }}
         >
-            <div className="relative h-20 w-80 md:w-96 mb-8 animate-pulse">
-                <Image
-                    src="/images/logo.png"
-                    alt="ALERTE ELEVES"
-                    fill
-                    className="object-contain"
-                    priority
-                />
+            {/* Dark Overlay for contrast (matches body::before) */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#070A12]/70 to-[#070A12]/90 pointer-events-none" />
+
+            <div className="relative z-10">
+                <div className="relative h-20 w-80 md:w-96 mb-8 animate-pulse">
+                    <Image
+                        src="/images/logo.png"
+                        alt="ALERTE ELEVES"
+                        fill
+                        className="object-contain"
+                        priority
+                    />
+                </div>
             </div>
 
             {/* Minimalist Text Container */}
