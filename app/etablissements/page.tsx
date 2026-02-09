@@ -23,6 +23,16 @@ export default function SchoolsPage() {
                             Une intervention physique d'1h par l'auteur (AM.17) et des supports pédagogiques durables.
                             Une approche <span className="text-white font-semibold">sans moralisation</span> qui favorise le dialogue.
                         </p>
+
+                        <div className="mb-8">
+                            <Link href="/etablissements/presentation">
+                                <Button size="lg" className="text-base gap-2 bg-secondary hover:bg-secondary/90 text-neutral-900 font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)] animate-pulse">
+                                    <BookOpen className="h-5 w-5" />
+                                    Voir la Fiche Interactive
+                                </Button>
+                            </Link>
+                        </div>
+
                         <div className="flex flex-wrap justify-center gap-4 text-sm font-medium text-neutral-soft">
                             <div className="flex items-center gap-2 bg-surface px-4 py-2 rounded-full border border-border">
                                 <School className="h-4 w-4 text-primary" /> Validé par les infirmières scolaires

@@ -37,8 +37,14 @@ export default function Home() {
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
+                  <Link href="/etablissements/presentation" className="w-full sm:w-auto">
+                    <Button variant="outline" size="lg" className="w-full text-base gap-2 border-secondary/50 text-secondary hover:bg-secondary/10">
+                      <BookOpen className="h-4 w-4" />
+                      Fiche École Interactive
+                    </Button>
+                  </Link>
                   <Link href="/etablissements" className="w-full sm:w-auto">
-                    <Button variant="outline" size="lg" className="w-full text-base">
+                    <Button variant="ghost" size="lg" className="w-full text-base">
                       Je suis un établissement
                     </Button>
                   </Link>
