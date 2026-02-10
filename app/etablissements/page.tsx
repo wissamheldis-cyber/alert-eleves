@@ -20,7 +20,7 @@ export default function SchoolsPage() {
                         <h1 className="text-3xl md:text-5xl font-bold text-white mb-6">Prévention en Établissement</h1>
                         <p className="text-neutral-soft text-lg md:text-xl mb-8 leading-relaxed">
                             Collèges, Lycées, CFA : une offre double pour un impact maximal.
-                            Une intervention physique d'1h par l'auteur (AM.17) et des supports pédagogiques durables.
+                            Une intervention physique par l'auteur (AM.17) et des supports pédagogiques durables.
                             Une approche <span className="text-white font-semibold">sans moralisation</span> qui favorise le dialogue.
                         </p>
 
@@ -35,10 +35,10 @@ export default function SchoolsPage() {
 
                         <div className="flex flex-wrap justify-center gap-4 text-sm font-medium text-neutral-soft">
                             <div className="flex items-center gap-2 bg-surface px-4 py-2 rounded-full border border-border">
-                                <School className="h-4 w-4 text-primary" /> Validé par les infirmières scolaires
+                                <School className="h-4 w-4 text-primary" /> Adaptation aux besoins de l'établissement
                             </div>
                             <div className="flex items-center gap-2 bg-surface px-4 py-2 rounded-full border border-border">
-                                <Users className="h-4 w-4 text-secondary" /> Adapté aux "Années Collège"
+                                <Users className="h-4 w-4 text-secondary" /> Adapté aux "Années Collège & Lycée"
                             </div>
                         </div>
                     </div>

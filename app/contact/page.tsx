@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Mail, MapPin } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -31,22 +31,17 @@ export default function ContactPage() {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-white mb-1">Email</h3>
-                                    <p className="text-neutral-soft hover:text-primary transition-colors cursor-pointer">bonjour@alerte-eleves.fr</p>
-                                    <p className="text-neutral-soft hover:text-primary transition-colors cursor-pointer">commandes@alerte-eleves.fr</p>
+                                    <a href="mailto:anassabdelrahman2@gmail.com" className="text-neutral-soft hover:text-primary transition-colors cursor-pointer block">anassabdelrahman2@gmail.com</a>
                                 </div>
                             </div>
 
                             <div className="flex items-start gap-4">
                                 <div className="w-10 h-10 rounded bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
-                                    <MapPin className="h-5 w-5" />
+                                    <Phone className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-white mb-1">Siège</h3>
-                                    <p className="text-neutral-soft">
-                                        ALERTE ELEVES<br />
-                                        123 Avenue de la Prévention<br />
-                                        75011 Paris
-                                    </p>
+                                    <h3 className="font-bold text-white mb-1">Téléphone</h3>
+                                    <a href="tel:+33614766965" className="text-neutral-soft hover:text-primary transition-colors">06 14 76 69 65</a>
                                 </div>
                             </div>
                         </div>

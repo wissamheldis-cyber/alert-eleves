@@ -71,9 +71,9 @@ export function Footer() {
 
                 <div className="border-t border-neutral-soft/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-soft">
                     <p>© {new Date().getFullYear()} ALERTE ELEVES — Déployé par <a href="https://shou-edition.com/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-primary transition-colors cursor-pointer">SHOU Edition</a>.</p>
-                    <a href="mailto:contact@alerte-eleves.com" className="flex items-center gap-2 hover:text-white transition-colors">
+                    <a href="mailto:anassabdelrahman2@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors">
                         <Mail className="h-4 w-4" />
-                        contact@alerte-eleves.com
+                        anassabdelrahman2@gmail.com
                     </a>
                 </div>
             </div>

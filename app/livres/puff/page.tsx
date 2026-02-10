@@ -46,7 +46,7 @@ export default function PuffBookPage() {
                                 <div>
                                     <div className="flex items-center gap-3 mb-4">
                                         <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold uppercase rounded-md border border-primary/20">Disponible</span>
-                                        <span className="text-neutral-soft text-sm flex items-center gap-1"><Clock className="h-3 w-3" /> Lecture : 45 min</span>
+                                        <span className="text-neutral-soft text-sm flex items-center gap-1"><Clock className="h-3 w-3" /> Lecture : 120 min</span>
                                     </div>
                                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
                                         Puff <span className="text-neutral-soft font-normal">|</span> Comprendre, résister, agir.
