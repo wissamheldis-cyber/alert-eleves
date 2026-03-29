@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, Sora } from "next/font/google";
+import { Inter, Sora, Oswald } from "next/font/google";
 import "./globals.css";
-import { SmartLoader } from "@/components/layout/SmartLoader";
+
 
 const inter = Inter({
   variable: "--font-inter",
@@ -11,6 +11,12 @@ const inter = Inter({
 const sora = Sora({
   variable: "--font-sora",
   subsets: ["latin"],
+});
+
+const oswald = Oswald({
+  variable: "--font-oswald",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -71,10 +77,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body
-        className={`${inter.variable} ${sora.variable} antialiased`}
-      >
-        <SmartLoader />
+      <body className={`${inter.variable} ${sora.variable} ${oswald.variable} font-sans bg-black text-foreground antialiased min-h-screen flex flex-col relative`}>
+        
+        {/* Subtle grid backdrop for inner pages — fades at centre */}
+        <div className="fixed inset-0 z-[-1] pointer-events-none bg-black overflow-hidden">
+            <div 
+                className="absolute inset-0 opacity-[0.035]" 
+                style={{
+                    backgroundImage: `linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)`,
+                    backgroundSize: '3.5rem 3.5rem',
+                }} 
+            />
+        </div>
+
         {children}
       </body>
     </html>
