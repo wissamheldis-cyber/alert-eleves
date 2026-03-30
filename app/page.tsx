@@ -63,7 +63,7 @@ export default function LiquidLoaderPage() {
 
             {/* ── TOP STRIPE ── */}
             <div className="relative z-20 w-full bg-[#CC0000] h-10 flex items-center justify-center shrink-0">
-                <span className="text-xs font-black uppercase tracking-[0.35em] text-white">Prévention</span>
+                <span className="text-xs font-black uppercase tracking-[0.35em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
             </div>
 
             {/* ── MAIN STAGE ── */}
@@ -150,12 +150,12 @@ export default function LiquidLoaderPage() {
 
             {/* ── BOTTOM STRIPE ── */}
             <div className="relative z-20 w-full bg-[#CC0000] h-10 flex items-center justify-center shrink-0">
-                <span className="text-xs font-black uppercase tracking-[0.35em] text-white">Pour Collège et Lycée</span>
+                <span className="text-xs font-black uppercase tracking-[0.35em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Pour Collège et Lycée</span>
             </div>
 
             {/* ── A.M. 17 SIGNATURE ── */}
             <div className="relative z-20 w-full bg-black h-10 flex items-center justify-center shrink-0 border-t border-white/5">
-                <span className="font-black text-sm text-white tracking-[0.3em]">A.M. <span className="text-[#CC0000]">17</span></span>
+                <span className="font-black text-sm text-white tracking-[0.3em]" style={{ fontFamily: "var(--font-orbitron, sans-serif)" }}>A.M. <span className="text-[#CC0000]">17</span></span>
             </div>
         </div>
     );

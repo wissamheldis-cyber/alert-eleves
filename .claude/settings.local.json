@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs ls:*)",
+      "Bash(grep -r \"A\\\\.M\\\\.17\\\\|A\\\\.M\\\\. 17\\\\|A\\\\.M 17\" /c/Users/Bonjour/Desktop/ALERTEELEVES/app --include=*.tsx)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

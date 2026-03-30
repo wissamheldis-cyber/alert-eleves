@@ -3,92 +3,52 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
 
-// ─── DATA ────────────────────────────────────────────────────────────────────
+// ─── TOOLS ───────────────────────────────────────────────────────────────────
 
 const TOOLS = [
-    { id: 1, label: "Dire non clairement", desc: "Sans se justifier ni débattre." },
-    { id: 2, label: "Créer des obstacles volontaires", desc: "Pour tenir son arrêt dans le temps." },
-    { id: 3, label: "Remplacer le réflexe", desc: "Une habitude saine à la place." },
-    { id: 4, label: "Soutenir sans juger", desc: "Ecouter, questionner, rester présent." },
-    { id: 5, label: "Le test du meilleur futur", desc: "Cette habitude me rapproche ou m'en eloigne ?" },
+    {
+        id: 1,
+        label: "Dire non clairement",
+        desc: "Non merci, je préfère pas. Sans te justifier. Sans débattre. Juste ça.",
+        for: "Pour toi si la pression sociale est ton principal déclencheur."
+    },
+    {
+        id: 2,
+        label: "Créer des obstacles volontaires",
+        desc: "Rends le geste plus difficile. Éloigne-toi. Attends 20 secondes.",
+        for: "Pour toi si le geste arrive de façon automatique sans que tu t'en rendes compte."
+    },
+    {
+        id: 3,
+        label: "Remplacer le réflexe",
+        desc: "Ton cerveau veut un geste, donne-lui en un autre. Respire, bouge, bois de l'eau.",
+        for: "Pour toi si tu cherches quelque chose à faire à la place."
+    },
+    {
+        id: 4,
+        label: "Soutenir sans juger",
+        desc: "Écoute d'abord. Pose des questions. Reste présent.",
+        for: "Pour toi si quelqu'un autour de toi traverse quelque chose difficile."
+    },
+    {
+        id: 5,
+        label: "Le test du meilleur futur",
+        desc: "Demande-toi : est-ce que ce geste rapproche ou éloigne la personne que je veux devenir ?",
+        for: "Pour toi si tu veux un outil mental pour prendre du recul."
+    },
 ];
 
 type StepDef =
-    | { type: "options"; id: string; phase: "A" | "B"; title: string; sub: string; options: string[] }
-    | { type: "text" | "textarea"; id: string; phase: "A" | "B"; title: string; sub: string; placeholder: string }
-    | { type: "tools"; id: string; phase: "A" | "B"; title: string; sub: string };
-
-const STEPS: StepDef[] = [
-    {
-        type: "options", id: "lieux", phase: "A",
-        title: "Ou le geste arrive ?",
-        sub: "Selectionne autant que tu veux.",
-        options: ["Devant mon lycee / college", "Chez des potes", "Dans la rue", "En soiree", "Aux transports", "Dans ma chambre", "Partout", "Je sais pas encore"]
-    },
-    {
-        type: "options", id: "moments", phase: "A",
-        title: "A quel moment ca arrive ?",
-        sub: "Tes moments a risque.",
-        options: ["Le matin avant les cours", "A la pause dejeuner", "Apres les cours", "Le soir", "Le week-end", "Quand je suis stresse", "Tout le temps"]
-    },
-    {
-        type: "options", id: "etat", phase: "A",
-        title: "Dans quel etat tu es quand ca arrive ?",
-        sub: "Emotions, niveau d'energie...",
-        options: ["Stresse / anxieux", "Ennuye", "Euphorique / festif", "Fatigue", "Sous pression scolaire", "Triste", "Heureux / en mode detente"]
-    },
-    {
-        type: "options", id: "contexte", phase: "A",
-        title: "Avec qui ? Dans quelle situation ?",
-        sub: "Ton contexte social declencheur.",
-        options: ["Seul", "En groupe d'amis", "Sous pression sociale", "Avec quelqu'un qui fume", "Pour m'integrer"]
-    },
-    {
-        type: "textarea", id: "synthese", phase: "A",
-        title: "Mes declencheurs — en resume",
-        sub: "Reformule ce que tu viens d'identifier. En quelques mots. Pour toi.",
-        placeholder: "Ex : Surtout en soiree avec des potes quand je suis stresse..."
-    },
-    {
-        type: "textarea", id: "situation", phase: "B",
-        title: "Ma situation aujourd'hui",
-        sub: "Dis-le comme tu le ressentirais a un pote. Pas de filtre.",
-        placeholder: "Ex : Je vapote environ 3-4 fois par jour, plutot le soir..."
-    },
-    {
-        type: "text", id: "changer", phase: "B",
-        title: "Ce que je voudrais changer — 1 seule chose",
-        sub: "Pas une liste, juste la priorite numero 1.",
-        placeholder: "Ex : Arreter de vapoter le soir avant de dormir"
-    },
-    {
-        type: "tools", id: "outil", phase: "B",
-        title: "L'outil que je vais tester en premier",
-        sub: "Choisis-en un seul. Tu peux changer d'avis plus tard."
-    },
-    {
-        type: "text", id: "phrase", phase: "B",
-        title: "Ma phrase anti-pression",
-        sub: "Quelque chose que tu peux dire (ou penser) quand quelqu'un te propose.",
-        placeholder: "Ex : Je l'ai deja fait, c'est bon"
-    },
-    {
-        type: "text", id: "declencheur", phase: "B",
-        title: "Mon declencheur principal a surveiller",
-        sub: "Une seule situation que tu veux garder en tete.",
-        placeholder: "Ex : Les soirees avec X"
-    },
-    {
-        type: "textarea", id: "confiance", phase: "B",
-        title: "Des personnes en qui j'ai confiance",
-        sub: "Pas obligatoire. Juste pour savoir a qui parler si besoin.",
-        placeholder: "Ex : Mon infirmiere scolaire, mon CPE..."
-    },
-];
+    | { type: "options"; id: string; title: string; sub: string; options: string[]; multi?: boolean }
+    | { type: "text" | "textarea"; id: string; title: string; sub: string; placeholder: string }
+    | { type: "tools"; id: string; title: string; sub: string }
+    | { type: "multi-text"; id: string; title: string; sub: string; fields: { id: string; label: string; placeholder: string }[] }
+    | { type: "choice-custom"; id: string; title: string; sub: string; groups: { label: string; options: string[] }[] };
 
 type Answers = Record<string, string | string[]>;
 
-// ─── PARTICLES ────────────────────────────────────────────────────────────────
+// ─── PARTICLES ───────────────────────────────────────────────────────────────
+
 function ParticlesLayer() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -141,7 +101,8 @@ function ParticlesLayer() {
     return <canvas ref={canvasRef} className="absolute inset-0 z-[2] pointer-events-none" />;
 }
 
-// ─── RIPPLE BUTTON ───────────────────────────────────────────────────────────
+// ─── RIPPLE BUTTON ────────────────────────────────────────────────────────────
+
 function RippleButton({
     children, onClick, className, disabled, variant = "primary", onMouseEnter, onMouseLeave
 }: {
@@ -201,6 +162,7 @@ function RippleButton({
 }
 
 // ─── CURSOR ───────────────────────────────────────────────────────────────────
+
 type CursorType = "default" | "button" | "text" | "option";
 function CustomCursor({ cursorType }: { cursorType: CursorType }) {
     const [pos, setPos] = useState({ x: -100, y: -100 });
@@ -223,48 +185,228 @@ function CustomCursor({ cursorType }: { cursorType: CursorType }) {
         <>
             <div
                 className="fixed pointer-events-none z-[999] rounded-full mix-blend-difference transition-[width,height] duration-150"
-                style={{
-                    width: c.size, height: c.size,
-                    background: c.color,
-                    opacity: c.opacity,
-                    top: pos.y - c.size / 2,
-                    left: pos.x - c.size / 2,
-                }}
+                style={{ width: c.size, height: c.size, background: c.color, opacity: c.opacity, top: pos.y - c.size / 2, left: pos.x - c.size / 2 }}
             />
             <div
                 className="fixed pointer-events-none z-[998] rounded-full border transition-[width,height,border-color] duration-200"
-                style={{
-                    width: c.ring, height: c.ring,
-                    borderColor: c.color,
-                    opacity: 0.4,
-                    top: pos.y - c.ring / 2,
-                    left: pos.x - c.ring / 2,
-                }}
+                style={{ width: c.ring, height: c.ring, borderColor: c.color, opacity: 0.4, top: pos.y - c.ring / 2, left: pos.x - c.ring / 2 }}
             />
         </>
     );
 }
 
+// ─── BACKGROUND LAYERS ────────────────────────────────────────────────────────
+
+function BgLayers() {
+    return (
+        <>
+            <div className="fixed inset-0 z-0 pointer-events-none bg-black">
+                <div className="absolute inset-0 bg-[url('/images/Fondd.png')] bg-cover bg-center mix-blend-screen opacity-60" />
+            </div>
+            <div className="fixed inset-0 z-[1] pointer-events-none" style={{ backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)", backgroundSize: "3.5rem 3.5rem", filter: "blur(0.5px)" }} />
+            <ParticlesLayer />
+            <div className="fixed inset-0 z-[3] pointer-events-none" style={{ background: "radial-gradient(ellipse 75% 70% at 50% 50%, transparent 10%, rgba(0,0,0,0.85) 100%)" }} />
+        </>
+    );
+}
+
+// ─── LOADER ───────────────────────────────────────────────────────────────────
+
+function AtelierLoader({ onComplete }: { onComplete: () => void }) {
+    useEffect(() => {
+        const timer = setTimeout(onComplete, 4000);
+        return () => clearTimeout(timer);
+    }, [onComplete]);
+
+    return (
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-6 bg-black/40 backdrop-blur-xl">
+            <div className="relative z-10 w-full max-w-sm flex flex-col items-center">
+                <div className="mb-10 relative text-center flex flex-col items-center">
+                    <div className="absolute -inset-10 bg-white/5 blur-3xl rounded-full opacity-50 pointer-events-none" />
+                    <img src="/images/logo.png" alt="Logo" className="w-16 h-auto mb-6 brightness-0 drop-shadow-[0_0_8px_rgba(255,255,255,1)]" />
+                    <img src="/images/chargement_eleves.png" alt="Chargement..." className="w-48 md:w-56 h-auto drop-shadow-[0_0_40px_rgba(255,255,255,0.25)] animate-pulse" />
+                </div>
+
+                <div className="w-full bg-white/5 backdrop-blur-2xl border border-white/10 p-7 rounded-[2.5rem] shadow-2xl space-y-5">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#CC0000] animate-ping" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/60">Analyse Perso</span>
+                    </div>
+                    <div className="space-y-2">
+                        <p className="text-white text-sm text-center font-black leading-tight uppercase tracking-[0.1em]">
+                            Prends 2 minutes pour toi.
+                        </p>
+                        <p className="text-white/40 text-[10px] text-center font-bold leading-relaxed tracking-[0.15em]">
+                            Découvre ton mode de fonctionnement<br />et tes propres déclencheurs.
+                        </p>
+                    </div>
+                    <div className="h-[2px] w-full bg-white/5 rounded-full overflow-hidden mt-2">
+                        <div className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.6)]" style={{ animation: "load 4s linear forwards" }} />
+                    </div>
+                </div>
+            </div>
+
+            <style>{`@keyframes load { 0% { width: 0%; } 100% { width: 100%; } }`}</style>
+        </div>
+    );
+}
+
+// ─── PRENOM SCREEN ────────────────────────────────────────────────────────────
+
+function PrenomScreen({ onSubmit, isMobile, setCursorType }: {
+    onSubmit: (name: string) => void;
+    isMobile: boolean;
+    setCursorType: (t: CursorType) => void;
+}) {
+    const [name, setName] = useState("");
+
+    const handleSubmit = () => {
+        onSubmit(name.trim());
+    };
+
+    return (
+        <div className="relative z-[10] flex flex-col min-h-screen items-center justify-center px-4 py-12">
+            <div className="w-full max-w-md">
+                <div className="w-full bg-[#08080C]/90 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_40px_120px_rgba(0,0,0,0.9)] overflow-hidden">
+                    <div className="flex flex-col items-center justify-center px-6 py-8 border-b border-white/5 bg-white/[0.02]">
+                        <img src="/images/logo.png" alt="Logo" className="w-12 h-auto mb-5 brightness-0 drop-shadow-[0_0_8px_rgba(255,255,255,1)]" />
+                        <h1 className="text-2xl md:text-3xl font-black uppercase tracking-[0.3em] text-white text-center" style={{ fontFamily: "var(--font-oswald, sans-serif)", textShadow: "0 0 30px rgba(255,255,255,0.3)" }}>
+                            Avant de commencer
+                        </h1>
+                    </div>
+
+                    <div className="p-8 md:p-10 space-y-8">
+                        <div className="text-center space-y-2">
+                            <p className="text-white font-bold text-lg leading-snug">
+                                Comment tu t&apos;appelles ?
+                            </p>
+                            <p className="text-neutral-500 text-sm">
+                                Pour personnaliser ton atelier. Facultatif.
+                            </p>
+                        </div>
+
+                        <input
+                            type="text"
+                            className="w-full bg-white/5 border border-white/15 rounded-2xl px-6 py-5 text-white text-base font-bold text-center focus:outline-none focus:border-white/40 transition-colors"
+                            placeholder="Ton prénom..."
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                            onKeyDown={e => e.key === "Enter" && handleSubmit()}
+                            onFocus={() => setCursorType("text")}
+                            onBlur={() => setCursorType("default")}
+                            autoFocus={!isMobile}
+                            maxLength={30}
+                        />
+
+                        <RippleButton
+                            onClick={handleSubmit}
+                            variant="primary"
+                            className="w-full py-5 rounded-2xl text-sm font-black uppercase tracking-[0.4em]"
+                            onMouseEnter={() => setCursorType("button")}
+                            onMouseLeave={() => setCursorType("default")}
+                        >
+                            {name.trim() ? `C'est parti, ${name.trim()} !` : "Commencer l'atelier"}
+                        </RippleButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
+
 export default function AtelierStandalone() {
+    const [stage, setStage] = useState<"loading" | "prenom" | "quiz">("loading");
+    const [prenom, setPrenom] = useState("");
     const [step, setStep] = useState(0);
     const [answers, setAnswers] = useState<Answers>({});
     const [cursorType, setCursorType] = useState<CursorType>("default");
-    const [animDir, setAnimDir] = useState<"in" | "out">("in");
     const [visible, setVisible] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        setIsMobile('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    }, []);
+
+    // ── STEPS (with prenom) ──
+    const STEPS: StepDef[] = [
+        {
+            type: "options", id: "devenir",
+            title: prenom
+                ? `${prenom}, qu'est-ce qui t'empêche d'être la version de toi que tu veux devenir ?`
+                : "Qu'est-ce qui t'empêche d'être la version de toi que tu veux devenir ?",
+            sub: "Une seule chose. La première qui te vient.",
+            options: ["La puff / le vapotage", "Les réseaux sociaux", "Le manque de sommeil", "La procrastination", "L'alimentation", "L'alcool", "Les jeux vidéo", "Autre chose"]
+        },
+        {
+            type: "options", id: "frequence",
+            title: prenom
+                ? `${prenom}, honnêtement, ça arrive à quelle fréquence ?`
+                : "Honnêtement, ça arrive à quelle fréquence ?",
+            sub: "Choisis-en une seule.",
+            options: ["Tout le temps, je le fais sans y penser", "Souvent, plusieurs fois par semaine", "Parfois, mais ça revient toujours", "Rarement, mais j'aimerais comprendre pourquoi ça arrive"]
+        },
+        {
+            type: "options", id: "contexte_detailed", multi: true,
+            title: prenom
+                ? `${prenom}, ça arrive surtout quand...`
+                : "Ça arrive surtout quand...",
+            sub: "Sélectionne autant que tu veux.",
+            options: [
+                "Je suis stressé / sous pression scolaire",
+                "Je m'ennuie et j'ai rien à faire",
+                "Je suis épuisé, plus d'énergie pour résister",
+                "Je suis avec des gens qui le font",
+                "Je veux m'intégrer, pas être à part",
+                "Je veux oublier quelque chose qui me pèse",
+                "Je suis seul et j'ai besoin de combler un vide",
+                "Je cherche une pause rapide pour souffler",
+                "Je me récompense après un effort",
+                "Sans raison précise, ça arrive tout seul"
+            ]
+        },
+        {
+            type: "tools", id: "outil",
+            title: prenom
+                ? `${prenom}, parmi ces 5 outils, lequel te correspond le plus ?`
+                : "Parmi ces 5 outils, lequel te correspond le plus ?",
+            sub: "Celui qui colle le mieux à ta situation. Un seul."
+        },
+        {
+            type: "multi-text", id: "futur",
+            title: prenom
+                ? `${prenom}, complète ces phrases. Pour toi. Personne ne voit tes réponses.`
+                : "Complète ces phrases. Pour toi. Personne ne voit tes réponses.",
+            sub: "Projette-toi dans ton meilleur futur.",
+            fields: [
+                { id: "devenir_goal", label: "Je vais devenir...", placeholder: "Ex : médecin, footballeur pro, entrepreneur, quelqu'un de libre..." },
+                { id: "demain_action", label: "Et pour ça, dès demain je vais...", placeholder: "Ex : utiliser mon outil, éviter mon déclencheur principal..." }
+            ]
+        },
+        {
+            type: "choice-custom", id: "phrase_finale",
+            title: prenom
+                ? `${prenom}, choisis ta phrase pour te rappeler ce que tu risques de perdre.`
+                : "Ma phrase pour me rappeler ce que je risque de perdre ou de détruire.",
+            sub: "Choisis ou écris la tienne.",
+            groups: [
+                { label: "Pour refuser", options: ["Non merci, je préfère pas.", "C'est bon pour moi."] },
+                { label: "Pour couper l'automatisme", options: ["C'est moi qui décide.", "Pas aujourd'hui.", "Je choisis mon futur.", "Mon cerveau propose. Moi je choisis.", "Je passe."] },
+                { label: "Pour avancer", options: ["Je vais le faire parce que je peux le faire.", "La liberté commence quand le geste cesse de choisir à ma place."] }
+            ]
+        }
+    ];
 
     const current = STEPS[step];
     const isDone = step >= STEPS.length;
     const progress = Math.min(((step + 1) / STEPS.length) * 100, 100);
-    const totalA = STEPS.filter(s => s.phase === "A").length;
 
     // ── transitions ──
     const goTo = useCallback((nextStep: number) => {
         setVisible(false);
-        setAnimDir("out");
         setTimeout(() => {
             setStep(nextStep);
-            setAnimDir("in");
             setVisible(true);
         }, 260);
     }, []);
@@ -272,7 +414,11 @@ export default function AtelierStandalone() {
     const next = () => goTo(step + 1);
     const prev = () => goTo(step - 1);
 
-    function toggleOption(id: string, val: string) {
+    function toggleOption(id: string, val: string, multi: boolean) {
+        if (!multi) {
+            setAnswers({ ...answers, [id]: val });
+            return;
+        }
         const prev2 = (answers[id] as string[] | undefined) ?? [];
         setAnswers({ ...answers, [id]: prev2.includes(val) ? prev2.filter(v => v !== val) : [...prev2, val] });
     }
@@ -283,318 +429,499 @@ export default function AtelierStandalone() {
 
     const canProceed = () => {
         if (!current) return false;
-        if (current.type === "textarea" || current.type === "text") return true;
-        const a = answers[current.id];
-        return Array.isArray(a) ? a.length > 0 : !!a;
+        if (current.type === "multi-text") {
+            return current.fields.some(f => !!answers[f.id]);
+        }
+        if (current.type === "choice-custom") {
+            return !!answers[current.id] || !!answers[current.id + "_custom"];
+        }
+        if (current.type === "options") {
+            const a = answers[current.id];
+            const perso = answers[current.id + "_perso"] as string;
+            return Array.isArray(a) ? a.length > 0 : (!!a || !!perso);
+        }
+        if (current.type === "tools") {
+            return !!answers[current.id];
+        }
+        return true; // text/textarea are optional
     };
 
     const selectedTool = TOOLS.find(t => t.id === Number(answers["outil"]));
+    const finalPhrase = (answers["phrase_finale_custom"] as string) || (answers["phrase_finale"] as string) || "";
+    const contextTriggers = ([answers["contexte_detailed"]] as string[][]).flat().filter(Boolean);
 
-    // ── phase label ──
-    const phaseLabel = !isDone && current?.phase === "A"
-        ? `ETAPE A — TES DECLENCHEURS (${step + 1}/${totalA})`
-        : !isDone ? `ETAPE B — TON PLAN PERSO (${step - totalA + 1}/${STEPS.length - totalA})` : "";
+    // ─── BILAN ────────────────────────────────────────────────────────────────
 
-    // ─── SUMMARY ───────────────────────────────────────────────────────────────
-    const SummaryCard = () => (
-        <div className="space-y-6">
-            <div className="border-b border-white/10 pb-4">
-                <div className="flex gap-3 flex-wrap">
-                    {["Automatisme ≠ Choix", "Nicotine ado ≠ Adulte", "Aerosol ≠ Air"].map(k => (
-                        <span key={k} className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">{k}</span>
-                    ))}
-                </div>
-            </div>
+    if (isDone) {
+        return (
+            <>
+                <BgLayers />
+                {!isMobile && <CustomCursor cursorType={cursorType} />}
+                <style>{!isMobile ? `* { cursor: none !important; }` : ""}</style>
 
-            <section>
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-3">Mes declencheurs</h3>
-                <div className="space-y-1.5 text-sm text-neutral-300">
-                    {([answers["lieux"]] as string[][]).flat().length > 0 && <p>Lieux :<span className="text-white ml-1">{([answers["lieux"]] as string[][]).flat().join(", ")}</span></p>}
-                    {([answers["moments"]] as string[][]).flat().length > 0 && <p>Moments :<span className="text-white ml-1">{([answers["moments"]] as string[][]).flat().join(", ")}</span></p>}
-                    {([answers["etat"]] as string[][]).flat().length > 0 && <p>Etat :<span className="text-white ml-1">{([answers["etat"]] as string[][]).flat().join(", ")}</span></p>}
-                    {([answers["contexte"]] as string[][]).flat().length > 0 && <p>Contexte :<span className="text-white ml-1">{([answers["contexte"]] as string[][]).flat().join(", ")}</span></p>}
-                </div>
-                {(answers["synthese"] as string) && (
-                    <p className="mt-3 text-sm text-white italic border-l-2 border-white/30 pl-3">{answers["synthese"] as string}</p>
-                )}
-            </section>
+                <div className="relative z-[10] flex flex-col min-h-screen">
 
-            <section>
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-3">Mon plan</h3>
-                <div className="space-y-3 text-sm">
-                    {(answers["changer"] as string) && <p className="text-neutral-200">Changer :<span className="text-white font-bold ml-1">{answers["changer"] as string}</span></p>}
-                    {selectedTool && (
-                        <div className="bg-white/5 border border-white/10 rounded-xl p-3">
-                            <p className="text-[10px] uppercase text-neutral-400 mb-1">Outil {selectedTool.id}</p>
-                            <p className="text-white font-bold">{selectedTool.label}</p>
+                    {/* ── même header que le quiz ── */}
+                    <div className="flex flex-col items-center pt-12 md:pt-20 pb-6 md:pb-10 shrink-0">
+                        <img src="/images/logo.png" alt="Logo" className="w-14 md:w-18 h-auto mb-8 md:mb-10 brightness-0 drop-shadow-[0_0_8px_rgba(255,255,255,1)]" />
+                        <div className="w-full bg-[#CC0000] flex items-center justify-center h-10 md:h-11 shadow-[0_2px_45px_rgba(204,0,0,0.55)]">
+                            <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
                         </div>
-                    )}
-                    {(answers["phrase"] as string) && <p className="text-neutral-200 italic">"{answers["phrase"] as string}"</p>}
-                    {(answers["declencheur"] as string) && <p className="text-neutral-200">A surveiller :<span className="text-white font-bold ml-1">{answers["declencheur"] as string}</span></p>}
-                </div>
-            </section>
-
-            <div className="border-t border-white/10 pt-4 text-center">
-                <p className="text-white text-sm font-bold italic leading-relaxed">
-                    "La liberte commence quand le geste cesse de choisir a ta place."
-                </p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-                {["Infirmier scolaire", "CPE", "3989"].map(r => (
-                    <div key={r} className="border border-white/10 bg-white/5 rounded-xl p-2 text-center">
-                        <p className="text-[10px] font-black text-neutral-300">{r}</p>
                     </div>
-                ))}
-            </div>
 
-            <RippleButton
-                onClick={() => { setStep(0); setAnswers({}); }}
-                variant="ghost"
-                className="w-full py-3 rounded-xl text-sm font-bold tracking-widest uppercase"
-                onMouseEnter={() => setCursorType("button")}
-                onMouseLeave={() => setCursorType("default")}
-            >
-                Recommencer
-            </RippleButton>
-        </div>
-    );
+                    {/* ── même carte que le quiz ── */}
+                    <div className="flex-1 flex items-start md:items-center justify-center px-3 pb-6 md:p-8">
+                        <div className="w-full max-w-2xl bg-[#08080C]/85 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_70px_180px_rgba(0,0,0,0.95)] overflow-hidden">
 
-    return (
-        <>
-            <CustomCursor cursorType={cursorType} />
-            <style>{`* { cursor: none !important; }`}</style>
-
-            {/* ── BG LAYER 1: Grid ── */}
-            <div
-                className="fixed inset-0 z-0 pointer-events-none"
-                style={{
-                    backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
-                    backgroundSize: "3.5rem 3.5rem",
-                    filter: "blur(0.5px)",
-                }}
-            />
-
-            {/* ── BG LAYER 2: Particles ── */}
-            <ParticlesLayer />
-
-            {/* ── BG LAYER 3: Vignette ── */}
-            <div
-                className="fixed inset-0 z-[3] pointer-events-none"
-                style={{
-                    background: "radial-gradient(ellipse 75% 70% at 50% 50%, transparent 10%, rgba(0,0,0,0.75) 100%)"
-                }}
-            />
-
-            {/* ── DASHBOARD ── */}
-            <div className="relative z-[10] flex flex-col min-h-screen py-12 md:py-20">
-
-                {/* ── TOP RED STRIPE ── */}
-                <div className="w-full bg-[#CC0000] shrink-0 flex items-center justify-center h-10 md:h-11 z-20 mb-8 md:mb-12"
-                    style={{ boxShadow: "0 2px 30px rgba(204,0,0,0.5)" }}
-                >
-                    <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-white">
-                        Prevention
-                    </span>
-                </div>
-
-                {/* ── CONTENT ── */}
-                <div className="flex-1 flex items-start md:items-center justify-center p-3 py-6 md:p-8">
-                <div
-                    className="w-full max-w-2xl"
-                    style={{
-                        borderRadius: "1.5rem",
-                        background: "rgba(8,8,12,0.85)",
-                        backdropFilter: "blur(24px) saturate(1.4)",
-                        WebkitBackdropFilter: "blur(24px) saturate(1.4)",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                        boxShadow: "0 0 0 1px rgba(255,255,255,0.06), 0 0 60px rgba(255,255,255,0.04), 0 40px 120px rgba(0,0,0,0.8)",
-                    }}
-                >
-                    {/* ── Header stripe ── */}
-                    <div
-                        className="flex items-center justify-between px-5 py-4 md:px-6"
-                        style={{
-                            borderBottom: "1px solid rgba(255,255,255,0.07)",
-                            background: "rgba(255,255,255,0.03)"
-                        }}
-                    >
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.35em] text-neutral-300">Alert'Eleves</p>
-                            <p className="text-[10px] text-white/25 tracking-[0.2em] uppercase">A.M. 17 — Portail LFD</p>
-                        </div>
-                        {!isDone && (
-                            <div className="text-right">
-                                <p className="text-[9px] uppercase tracking-widest text-white/20">{STEPS.length} etapes</p>
-                                <p className="text-xs font-bold text-white/50">{step + 1}/{STEPS.length}</p>
+                            {/* En-tête carte */}
+                            <div className="flex flex-col items-center justify-center px-6 py-8 md:py-10 border-b border-white/5 bg-white/[0.02]">
+                                <h1 className="text-2xl md:text-4xl font-black uppercase tracking-[0.4em] text-white text-center"
+                                    style={{ fontFamily: "var(--font-oswald, sans-serif)", textShadow: "0 0 30px rgba(255,255,255,0.4)" }}>
+                                    Alert&apos;Élèves
+                                </h1>
+                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#CC0000] mt-3">
+                                    {prenom ? `Bilan de ${prenom}` : "Mon bilan"}
+                                </p>
                             </div>
-                        )}
-                    </div>
 
-                    {/* ── Progress bar ── */}
-                    {!isDone && (
-                        <div className="h-[2px] bg-white/5 mx-5 md:mx-6 mt-4 rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-white/40 transition-all duration-500"
-                                style={{ width: `${progress}%`, boxShadow: "0 0 8px rgba(255,255,255,0.3)" }}
-                            />
-                        </div>
-                    )}
+                            {/* Barre pleine */}
+                            <div className="h-[2.5px] w-full bg-white/5">
+                                <div className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]" style={{ width: "100%" }} />
+                            </div>
 
-                    {/* ── Content ── */}
-                    <div className="p-4 md:p-8 min-h-[20rem]">
-                        <div
-                            className="transition-all duration-250"
-                            style={{
-                                opacity: visible ? 1 : 0,
-                                transform: visible
-                                    ? "translateY(0)"
-                                    : animDir === "out" ? "translateY(-12px)" : "translateY(12px)",
-                            }}
-                        >
-                            {isDone ? (
-                                <SummaryCard />
-                            ) : (
-                                <>
-                                    {/* Phase label */}
-                                    <p className="text-[9px] font-black uppercase tracking-[0.35em] text-neutral-500 mb-4">{phaseLabel}</p>
+                            {/* Corps scrollable */}
+                            <div className="p-5 md:p-10">
+                                <div className="overflow-y-auto custom-scrollbar space-y-4" style={{ maxHeight: "calc(100dvh - 380px)", minHeight: "200px" }}>
 
-                                    {/* Question */}
-                                    <h2 className="text-xl md:text-2xl font-black text-white mb-1 leading-tight tracking-tight" style={{ fontFamily: "var(--font-oswald, sans-serif)" }}>
-                                        {current.title}
-                                    </h2>
-                                    <p className="text-neutral-500 text-sm mb-6">{current.sub}</p>
+                                    {/* PHRASE HERO */}
+                                    {finalPhrase && (
+                                        <div className="relative overflow-hidden rounded-[1.5rem]">
+                                            <div className="absolute inset-0 bg-white/[0.04] backdrop-blur-sm" />
+                                            <div className="absolute inset-0 border border-white/15 rounded-[1.5rem]" />
+                                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+                                            <div className="relative px-6 py-7 md:px-8 md:py-8 text-center">
+                                                <p className="text-[9px] font-black uppercase tracking-[0.6em] text-white/40 mb-4">Ma phrase</p>
+                                                <p className="text-lg md:text-xl font-black italic text-white leading-snug"
+                                                    style={{ textShadow: "0 0 40px rgba(255,255,255,0.3)" }}>
+                                                    &ldquo;{finalPhrase}&rdquo;
+                                                </p>
+                                            </div>
+                                            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                                        </div>
+                                    )}
 
-                                    {/* Input */}
-                                    <div className="space-y-2">
-                                        {current.type === "options" && (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                {current.options.map(opt => {
-                                                    const sel = ((answers[current.id] as string[]) ?? []).includes(opt);
-                                                    return (
-                                                        <button
-                                                            key={opt}
-                                                            onClick={() => toggleOption(current.id, opt)}
-                                                            onMouseEnter={() => setCursorType("option")}
-                                                            onMouseLeave={() => setCursorType("default")}
-                                                            className={cn(
-                                                                "px-3 py-3 rounded-xl text-sm font-medium text-left border transition-all duration-150 active:scale-95",
-                                                                sel
-                                                                    ? "bg-white/10 border-white/40 text-white"
-                                                                    : "bg-white/[0.03] border-white/10 text-neutral-300 hover:bg-white/[0.06] hover:border-white/20"
-                                                            )}
-                                                            style={sel ? { boxShadow: "0 0 14px rgba(255,255,255,0.12)" } : undefined}
-                                                        >
-                                                            {opt}
-                                                        </button>
-                                                    );
-                                                })}
+                                    {/* OUTIL */}
+                                    {selectedTool && (
+                                        <div className="bg-white/[0.03] border border-white/8 rounded-2xl overflow-hidden">
+                                            <div className="flex items-center gap-4 px-5 py-4 border-b border-white/5">
+                                                <div className="w-10 h-10 rounded-full bg-[#CC0000] flex items-center justify-center shrink-0 shadow-[0_0_18px_rgba(204,0,0,0.45)]">
+                                                    <span className="text-sm font-black text-white">{selectedTool.id}</span>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-[0.45em] text-[#CC0000] mb-0.5">Mon outil</p>
+                                                    <p className="text-base font-black text-white leading-tight">{selectedTool.label}</p>
+                                                </div>
+                                            </div>
+                                            <div className="px-5 py-4 space-y-2">
+                                                <p className="text-sm text-neutral-400 leading-relaxed">{selectedTool.desc}</p>
+                                                <div className="h-px bg-white/5" />
+                                                <p className="text-[11px] italic text-neutral-600">{selectedTool.for}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* DÉCLENCHEURS */}
+                                    {contextTriggers.length > 0 && (
+                                        <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5">
+                                            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/25 mb-3">Mes déclencheurs</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {contextTriggers.map(t => (
+                                                    <span key={t} className="px-3 py-1.5 bg-[#CC0000]/10 border border-[#CC0000]/20 rounded-full text-xs font-medium text-[#FF6666] leading-none">
+                                                        {t}
+                                                    </span>
+                                                ))}
+                                                {(answers["contexte_detailed_perso"] as string) && (
+                                                    <span className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-neutral-400 italic leading-none">
+                                                        {answers["contexte_detailed_perso"] as string}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* OBSTACLE + FRÉQUENCE */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {(answers["devenir"] as string) && (
+                                            <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-4">
+                                                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">Mon obstacle</p>
+                                                <p className="text-sm font-bold text-white leading-snug">{answers["devenir"] as string}</p>
+                                                {(answers["devenir_perso"] as string) && (
+                                                    <p className="text-xs text-neutral-500 mt-1 italic">{answers["devenir_perso"] as string}</p>
+                                                )}
                                             </div>
                                         )}
-
-                                        {current.type === "text" && (
-                                            <input
-                                                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-white/30 transition-colors"
-                                                placeholder={current.placeholder}
-                                                value={(answers[current.id] as string) ?? ""}
-                                                onChange={e => setText(current.id, e.target.value)}
-                                                onFocus={() => setCursorType("text")}
-                                                onBlur={() => setCursorType("default")}
-                                            />
-                                        )}
-
-                                        {current.type === "textarea" && (
-                                            <textarea
-                                                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm min-h-[120px] focus:outline-none focus:border-white/30 transition-colors resize-none"
-                                                placeholder={current.placeholder}
-                                                value={(answers[current.id] as string) ?? ""}
-                                                onChange={e => setText(current.id, e.target.value)}
-                                                onFocus={() => setCursorType("text")}
-                                                onBlur={() => setCursorType("default")}
-                                            />
-                                        )}
-
-                                        {current.type === "tools" && (
-                                            <div className="space-y-2">
-                                                {TOOLS.map(tool => {
-                                                    const sel = answers["outil"] === String(tool.id);
-                                                    return (
-                                                        <button
-                                                            key={tool.id}
-                                                            onClick={() => setText("outil", String(tool.id))}
-                                                            onMouseEnter={() => setCursorType("option")}
-                                                            onMouseLeave={() => setCursorType("default")}
-                                                            className={cn(
-                                                                "w-full text-left p-4 rounded-xl border transition-all duration-150 active:scale-[0.99]",
-                                                                sel
-                                                                    ? "bg-white/10 border-white/35 text-white"
-                                                                    : "bg-white/[0.03] border-white/10 text-neutral-300 hover:border-white/20 hover:bg-white/[0.05]"
-                                                            )}
-                                                            style={sel ? { boxShadow: "0 0 16px rgba(255,255,255,0.1)" } : undefined}
-                                                        >
-                                                            <span className="block text-[9px] font-black uppercase tracking-[0.3em] text-neutral-400 mb-1">Outil {tool.id}</span>
-                                                            <span className="block font-bold text-sm">{tool.label}</span>
-                                                            <span className="block text-neutral-500 text-xs mt-0.5">{tool.desc}</span>
-                                                        </button>
-                                                    );
-                                                })}
+                                        {(answers["frequence"] as string) && (
+                                            <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-4">
+                                                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">Fréquence</p>
+                                                <p className="text-sm font-medium text-neutral-300 leading-snug">{answers["frequence"] as string}</p>
                                             </div>
                                         )}
                                     </div>
-                                </>
-                            )}
+
+                                    {/* OBJECTIFS */}
+                                    {((answers["devenir_goal"] as string) || (answers["demain_action"] as string)) && (
+                                        <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5">
+                                            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/25 mb-3">Mon objectif</p>
+                                            <div className="space-y-3">
+                                                {(answers["devenir_goal"] as string) && (
+                                                    <div className="flex gap-3 items-start">
+                                                        <span className="w-1.5 h-1.5 mt-[7px] rounded-full bg-[#CC0000] shrink-0" />
+                                                        <p className="text-sm text-white font-medium leading-relaxed">{answers["devenir_goal"] as string}</p>
+                                                    </div>
+                                                )}
+                                                {(answers["demain_action"] as string) && (
+                                                    <div className="flex gap-3 items-start">
+                                                        <span className="w-1.5 h-1.5 mt-[7px] rounded-full bg-white/30 shrink-0" />
+                                                        <p className="text-sm text-neutral-400 leading-relaxed">{answers["demain_action"] as string}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* CLÉS */}
+                                    <div className="border border-white/5 rounded-2xl px-5 py-4">
+                                        <div className="flex justify-between gap-2">
+                                            {["Automatisme ≠ Choix", "Nicotine ado ≠ Adulte", "Aérosol ≠ Air"].map(k => (
+                                                <p key={k} className="text-[9px] font-bold uppercase text-neutral-700 leading-tight text-center flex-1">{k}</p>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* RESSOURCES */}
+                                    <div>
+                                        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 mb-3 text-center">Si t&apos;as besoin</p>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {["Infirmier·ère", "CPE", "3989"].map(r => (
+                                                <div key={r} className="bg-[#CC0000]/8 border border-[#CC0000]/20 rounded-xl py-3 px-2 text-center">
+                                                    <p className="text-xs font-black text-[#FF5555]">{r}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            {/* Pied de carte */}
+                            <div className="flex justify-center px-5 md:px-8 py-6 bg-white/[0.03] border-t border-white/5">
+                                <RippleButton
+                                    onClick={() => { setStep(0); setAnswers({}); }}
+                                    variant="ghost"
+                                    className="px-10 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest"
+                                    onMouseEnter={() => setCursorType("button")}
+                                    onMouseLeave={() => setCursorType("default")}
+                                >
+                                    Recommencer depuis le début
+                                </RippleButton>
+                            </div>
+
                         </div>
                     </div>
 
-                    {/* ── Footer nav ── */}
-                    {!isDone && (
-                        <div
-                            className="flex justify-between items-center px-4 md:px-6 py-4"
-                            style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-                        >
-                            <RippleButton
-                                onClick={prev}
-                                disabled={step === 0}
-                                variant="ghost"
-                                className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest"
-                                onMouseEnter={() => setCursorType("button")}
-                                onMouseLeave={() => setCursorType("default")}
-                            >
-                                Retour
-                            </RippleButton>
+                    {/* ── même footer que le quiz ── */}
+                    <div className="w-full bg-[#CC0000] shrink-0 flex items-center justify-center h-10 z-20 mt-8 shadow-[0_-2px_50px_rgba(204,0,0,0.5)]">
+                        <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
+                    </div>
+                    <div className="w-full bg-black shrink-0 h-10 flex items-center justify-center border-t border-white/5 z-20">
+                        <span className="font-black text-[15px] text-white tracking-[0.4em]" style={{ fontFamily: "var(--font-orbitron, monospace)" }}>
+                            A.M. <span className="text-[#CC0000]">17</span>
+                        </span>
+                    </div>
 
-                            <RippleButton
-                                onClick={next}
-                                disabled={current.type !== "text" && current.type !== "textarea" && !canProceed()}
-                                variant="primary"
-                                className="px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest"
-                                onMouseEnter={() => setCursorType("button")}
-                                onMouseLeave={() => setCursorType("default")}
-                            >
-                                {step === STEPS.length - 1 ? "Voir ma carte" : "Suivant"}
-                            </RippleButton>
+                </div>
+
+                <style jsx global>{`
+                    .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+                    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+                    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+                `}</style>
+            </>
+        );
+    }
+
+    // ─── RENDER ───────────────────────────────────────────────────────────────
+
+    if (stage === "loading") {
+        return (
+            <>
+                <BgLayers />
+                {!isMobile && <CustomCursor cursorType={cursorType} />}
+                <style>{!isMobile ? `* { cursor: none !important; }` : ""}</style>
+                <AtelierLoader onComplete={() => setStage("prenom")} />
+            </>
+        );
+    }
+
+    if (stage === "prenom") {
+        return (
+            <>
+                <BgLayers />
+                {!isMobile && <CustomCursor cursorType={cursorType} />}
+                <style>{!isMobile ? `* { cursor: none !important; }` : ""}</style>
+                <PrenomScreen
+                    onSubmit={(name) => { setPrenom(name); setStage("quiz"); }}
+                    isMobile={isMobile}
+                    setCursorType={setCursorType}
+                />
+            </>
+        );
+    }
+
+    return (
+        <>
+            {!isMobile && <CustomCursor cursorType={cursorType} />}
+            <style>{!isMobile ? `* { cursor: none !important; }` : ""}</style>
+
+            <BgLayers />
+
+            {/* ── STAGE ── */}
+            <div className="relative z-[10] flex flex-col min-h-screen">
+
+                {/* ── LOGO & TOP RIBBON ── */}
+                <div className="flex flex-col items-center pt-12 md:pt-20 pb-6 md:pb-10 shrink-0">
+                    <img
+                        src="/images/logo.png"
+                        alt="Logo"
+                        className="w-14 md:w-18 h-auto mb-8 md:mb-10 brightness-0 drop-shadow-[0_0_8px_rgba(255,255,255,1)]"
+                    />
+                    <div className="w-full bg-[#CC0000] flex items-center justify-center h-10 md:h-11 shadow-[0_2px_45px_rgba(204,0,0,0.55)]">
+                        <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
+                    </div>
+                </div>
+
+                <div className="flex-1 flex items-start md:items-center justify-center px-3 pb-6 md:p-8">
+                    <div className="w-full max-w-2xl bg-[#08080C]/85 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_70px_180px_rgba(0,0,0,0.95)] overflow-hidden">
+
+                        {/* Header Branding */}
+                        <div className="flex flex-col items-center justify-center px-6 py-8 md:py-10 border-b border-white/5 bg-white/[0.02]">
+                            <h1 className="text-2xl md:text-4xl font-black uppercase tracking-[0.4em] text-white text-center"
+                                style={{ fontFamily: "var(--font-oswald, sans-serif)", textShadow: "0 0 30px rgba(255,255,255,0.4)" }}>
+                                Alert&apos;Élèves
+                            </h1>
                         </div>
-                    )}
-                </div>
+
+                        {/* Progress */}
+                        {!isDone && (
+                            <div className="h-[2.5px] w-full bg-white/5">
+                                <div className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)] transition-all duration-500" style={{ width: `${progress}%` }} />
+                            </div>
+                        )}
+
+                        {/* Body */}
+                        <div className="p-5 md:p-10 min-h-[20rem]">
+                            <div style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)", transition: "opacity 0.25s, transform 0.25s" }}>
+                                <div className="flex flex-col h-full">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#CC0000]">Étape {step + 1}</p>
+                                            <p className="text-[10px] font-black text-white/20 tracking-widest">{step + 1} / {STEPS.length}</p>
+                                        </div>
+
+                                        <div className="overflow-y-auto pr-1 custom-scrollbar" style={{ maxHeight: "calc(100dvh - 320px)", minHeight: "200px" }}>
+                                            <h2 className="text-xl md:text-3xl font-black text-white mb-3 leading-tight tracking-tight" style={{ fontFamily: "var(--font-oswald, sans-serif)" }}>
+                                                {current.title}
+                                            </h2>
+                                            <p className="text-neutral-500 text-[13px] mb-8 tracking-wide font-medium opacity-80 leading-relaxed">{current.sub}</p>
+
+                                            <div className="space-y-4 pb-4">
+
+                                                {/* OPTIONS */}
+                                                {current.type === "options" && (
+                                                    <div className="space-y-3">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                            {current.options.map(opt => {
+                                                                const sel = Array.isArray(answers[current.id])
+                                                                    ? (answers[current.id] as string[]).includes(opt)
+                                                                    : answers[current.id] === opt;
+                                                                return (
+                                                                    <button
+                                                                        key={opt}
+                                                                        onClick={() => toggleOption(current.id, opt, !!current.multi)}
+                                                                        onMouseEnter={() => setCursorType("option")}
+                                                                        onMouseLeave={() => setCursorType("default")}
+                                                                        className={cn(
+                                                                            "px-4 py-3.5 rounded-xl text-sm font-medium text-left border transition-all duration-150 active:scale-[0.98] leading-snug",
+                                                                            sel ? "bg-white/15 border-white/50 text-white shadow-[0_0_20px_rgba(255,255,255,0.08)]" : "bg-white/[0.04] border-white/10 text-neutral-300 hover:bg-white/[0.07] hover:border-white/25"
+                                                                        )}
+                                                                    >
+                                                                        {opt}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                        <div className="mt-4">
+                                                            <p className="text-[10px] font-bold text-neutral-600 mb-2 ml-1 tracking-widest uppercase">Ta propre réponse (facultatif) :</p>
+                                                            <input
+                                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-white/30 transition-colors"
+                                                                placeholder="Précise ta situation..."
+                                                                value={(answers[current.id + "_perso"] as string) ?? ""}
+                                                                onChange={e => setText(current.id + "_perso", e.target.value)}
+                                                                onFocus={() => setCursorType("text")}
+                                                                onBlur={() => setCursorType("default")}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* TOOLS */}
+                                                {current.type === "tools" && (
+                                                    <div className="space-y-3">
+                                                        {TOOLS.map(tool => {
+                                                            const sel = answers["outil"] === String(tool.id);
+                                                            return (
+                                                                <button
+                                                                    key={tool.id}
+                                                                    onClick={() => setText("outil", String(tool.id))}
+                                                                    onMouseEnter={() => setCursorType("option")}
+                                                                    onMouseLeave={() => setCursorType("default")}
+                                                                    className={cn(
+                                                                        "w-full text-left p-5 rounded-2xl border transition-all duration-150 active:scale-[0.99]",
+                                                                        sel ? "bg-white/12 border-white/40 text-white shadow-[0_0_30px_rgba(255,255,255,0.05)]" : "bg-white/5 border-white/10 text-neutral-400 hover:border-white/20"
+                                                                    )}
+                                                                >
+                                                                    <p className="text-[10px] font-black text-[#CC0000] uppercase tracking-[0.4em] mb-1.5">Outil {tool.id}</p>
+                                                                    <p className="font-black text-white text-sm md:text-base mb-1 leading-snug">{tool.label}</p>
+                                                                    <p className="text-xs text-neutral-500 mb-3 leading-relaxed">{tool.desc}</p>
+                                                                    <div className="h-[1px] w-10 bg-white/10 mb-3" />
+                                                                    <p className="text-[10px] italic text-neutral-600">{tool.for}</p>
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+
+                                                {/* MULTI-TEXT */}
+                                                {current.type === "multi-text" && (
+                                                    <div className="space-y-7">
+                                                        {current.fields.map(f => (
+                                                            <div key={f.id}>
+                                                                <label className="block text-[10px] font-black uppercase tracking-[0.4em] text-neutral-500 mb-3 ml-1">{f.label}</label>
+                                                                <input
+                                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white text-sm font-medium focus:outline-none focus:border-white/30 transition-colors shadow-inner"
+                                                                    placeholder={f.placeholder}
+                                                                    value={(answers[f.id] as string) ?? ""}
+                                                                    onChange={e => setText(f.id, e.target.value)}
+                                                                    onFocus={() => setCursorType("text")}
+                                                                    onBlur={() => setCursorType("default")}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* CHOICE-CUSTOM (question 6) */}
+                                                {current.type === "choice-custom" && (
+                                                    <div className="space-y-6">
+                                                        {current.groups.map(group => (
+                                                            <div key={group.label}>
+                                                                <div className="flex items-center gap-3 mb-4">
+                                                                    <div className="h-[1px] flex-1 bg-white/5" />
+                                                                    <p className="text-[9px] font-black text-[#CC0000] tracking-[0.4em] opacity-80 uppercase">{group.label}</p>
+                                                                    <div className="h-[1px] flex-1 bg-white/5" />
+                                                                </div>
+                                                                <div className="grid grid-cols-1 gap-2">
+                                                                    {group.options.map(opt => (
+                                                                        <button
+                                                                            key={opt}
+                                                                            onClick={() => setAnswers(prev => ({ ...prev, [current.id]: opt, [current.id + "_custom"]: "" }))}
+                                                                            onMouseEnter={() => setCursorType("option")}
+                                                                            onMouseLeave={() => setCursorType("default")}
+                                                                            className={cn(
+                                                                                "px-4 py-3.5 rounded-xl text-sm font-medium border text-left transition-all",
+                                                                                answers[current.id] === opt ? "bg-white/15 border-white/50 text-white shadow-lg" : "bg-transparent border-white/8 text-neutral-400 hover:text-neutral-200 hover:border-white/20"
+                                                                            )}
+                                                                        >
+                                                                            {opt}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                        <div className="pt-5 border-t border-white/5">
+                                                            <label className="block text-[10px] font-black uppercase tracking-[0.4em] text-neutral-500 mb-4 text-center">Ou exprime-la à ta façon</label>
+                                                            <input
+                                                                className="w-full bg-white/10 border border-white/20 rounded-2xl px-6 py-5 text-white text-sm font-medium text-center focus:outline-none focus:border-white/40 transition-colors shadow-inner"
+                                                                placeholder="Ta phrase personnelle..."
+                                                                value={(answers[current.id + "_custom"] as string) ?? ""}
+                                                                onChange={e => setAnswers(prev => ({ ...prev, [current.id + "_custom"]: e.target.value, [current.id]: "" }))}
+                                                                onFocus={() => setCursorType("text")}
+                                                                onBlur={() => setCursorType("default")}
+                                                                onMouseEnter={() => setCursorType("text")}
+                                                                onMouseLeave={() => setCursorType("default")}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* TEXT */}
+                                                {current.type === "text" && (
+                                                    <input
+                                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white text-sm font-medium focus:outline-none focus:border-white/30 transition-colors"
+                                                        placeholder={current.placeholder}
+                                                        value={(answers[current.id] as string) ?? ""}
+                                                        onChange={e => setText(current.id, e.target.value)}
+                                                        onFocus={() => setCursorType("text")}
+                                                        onBlur={() => setCursorType("default")}
+                                                    />
+                                                )}
+
+                                                {/* TEXTAREA */}
+                                                {current.type === "textarea" && (
+                                                    <textarea
+                                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white min-h-[130px] text-sm font-medium focus:outline-none focus:border-white/30 transition-colors resize-none"
+                                                        placeholder={current.placeholder}
+                                                        value={(answers[current.id] as string) ?? ""}
+                                                        onChange={e => setText(current.id, e.target.value)}
+                                                        onFocus={() => setCursorType("text")}
+                                                        onBlur={() => setCursorType("default")}
+                                                    />
+                                                )}
+
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        {!isDone && (
+                            <div className="flex justify-between items-center px-5 md:px-8 py-6 bg-white/[0.03] border-t border-white/5">
+                                <RippleButton onClick={prev} disabled={step === 0} variant="ghost" className="px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-[0.3em]" onMouseEnter={() => setCursorType("button")} onMouseLeave={() => setCursorType("default")}>Retour</RippleButton>
+                                <RippleButton onClick={next} disabled={!canProceed()} variant="primary" className="px-8 md:px-12 py-3.5 rounded-xl text-xs font-black uppercase tracking-[0.4em] shadow-[0_0_30px_rgba(255,255,255,0.05)]" onMouseEnter={() => setCursorType("button")} onMouseLeave={() => setCursorType("default")}>
+                                    {step === STEPS.length - 1 ? "Voir mon bilan" : "Suivant"}
+                                </RippleButton>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* ── BOTTOM RED STRIPE ── */}
-                <div className="w-full bg-[#CC0000] shrink-0 flex items-center justify-center h-10 md:h-11 z-20 mt-8 md:mt-12"
-                    style={{ boxShadow: "0 -2px 30px rgba(204,0,0,0.5)" }}
-                >
-                    <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-white">
-                        Pour College et Lycee
-                    </span>
+                {/* ── BOTTOM RED RIBBON ── */}
+                <div className="w-full bg-[#CC0000] shrink-0 flex items-center justify-center h-10 z-20 mt-8 shadow-[0_-2px_50px_rgba(204,0,0,0.5)]">
+                    <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
                 </div>
 
-                {/* ── A.M.17 SIGNATURE ── */}
-                <div className="w-full bg-black shrink-0 h-9 flex items-center justify-center border-t border-white/5 z-20 mt-4">
-                    <span className="font-black text-sm text-white tracking-[0.3em]">
+                <div className="w-full bg-black shrink-0 h-10 flex items-center justify-center border-t border-white/5 z-20">
+                    <span className="font-black text-[15px] text-white tracking-[0.4em]" style={{ fontFamily: "var(--font-orbitron, monospace)" }}>
                         A.M. <span className="text-[#CC0000]">17</span>
                     </span>
                 </div>
-
             </div>
+
+            <style jsx global>{`
+                .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+            `}</style>
         </>
     );
 }

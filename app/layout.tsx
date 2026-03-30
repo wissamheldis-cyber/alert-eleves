@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Sora, Oswald } from "next/font/google";
+import { Inter, Sora, Oswald, League_Spartan, Rubik_Mono_One, Orbitron } from "next/font/google";
 import "./globals.css";
 
 
@@ -19,8 +19,25 @@ const oswald = Oswald({
   weight: ["400", "700"],
 });
 
+const leagueSpartan = League_Spartan({
+  variable: "--font-league-spartan",
+  subsets: ["latin"],
+});
+
+const rubikMono = Rubik_Mono_One({
+  variable: "--font-rubik-mono",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+});
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://alerte-eleves.com'), // Replace with actual domain
+  metadataBase: new URL('https://alerteleves.com'), // Replace with actual domain
   title: {
     default: "ALERTE ELEVES — Prévention Puff & Vapotage",
     template: "%s | ALERTE ELEVES"
@@ -77,7 +94,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${inter.variable} ${sora.variable} ${oswald.variable} font-sans bg-black text-foreground antialiased min-h-screen flex flex-col relative`}>
+      <body className={`${inter.variable} ${sora.variable} ${oswald.variable} ${leagueSpartan.variable} ${rubikMono.variable} ${orbitron.variable} font-sans bg-black text-foreground antialiased min-h-screen flex flex-col relative`}>
         
         {/* Subtle grid backdrop for inner pages — fades at centre */}
         <div className="fixed inset-0 z-[-1] pointer-events-none bg-black overflow-hidden">

@@ -32,7 +32,7 @@ const STEPS: Step[] = [
         type: "options", id: "moments", phase: "A",
         title: "À quel moment ça arrive ?",
         sub: "Tes moments à risque.",
-        options: ["Le matin avant les cours", "À la pause déjeuner", "Après les cours", "Le soir", "Le week-end", "Quand je suis stressé·e", "Tout le temps"]
+        options: ["Le matin avant les cours", "À la pause déjeuner", "Après les cours", "Le soir", "Le week-end", "Quand je suis stressé·e", "À n'importe quel moment"]
     },
     {
         type: "options", id: "etat", phase: "A",
@@ -131,9 +131,10 @@ export default function AtelierPage() {
 
     function canProceed() {
         if (!current) return false;
-        if (current.type === "textarea" || current.type === "text") return true; // optional
+        if (current.type === "textarea" || current.type === "text") return true;
         const a = answers[current.id];
-        return Array.isArray(a) ? a.length > 0 : !!a;
+        const perso = answers[current.id + "_perso"] as string;
+        return Array.isArray(a) ? (a.length > 0 || !!perso) : (!!a || !!perso);
     }
 
     function next() { if (step < STEPS.length) setStep(s => s + 1); }
@@ -143,8 +144,8 @@ export default function AtelierPage() {
 
     // ── PHASE MARKER ─────────────────────────────────────────
     const phaseLabel = current?.phase === "A"
-        ? `🔍 Étape A — Tes déclencheurs (${step + 1}/${totalA})`
-        : `⚡ Étape B — Ton plan perso (${step - totalA + 1}/${STEPS.length - totalA})`;
+        ? `🔍 Étape A, Tes déclencheurs (${step + 1}/${totalA})`
+        : `⚡ Étape B, Ton plan perso (${step - totalA + 1}/${STEPS.length - totalA})`;
 
     // ─── SUMMARY CARD ─────────────────────────────────────────
     if (step >= STEPS.length) {
@@ -163,7 +164,7 @@ export default function AtelierPage() {
                 <div id="atelier-card" className="w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10">
                     {/* Header */}
                     <div className="bg-[#FF1E1E] px-6 pt-6 pb-4">
-                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-100 mb-1">A.M.17 — Alert'Élèves</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-100 mb-1">A.M.17 Alert'Élèves</p>
                         <h1 className="text-2xl font-black text-white leading-tight">Ma Carte<br />Anti-Puff</h1>
                     </div>
 
@@ -287,6 +288,15 @@ export default function AtelierPage() {
                                 onClick={() => toggleOption(current.id, opt)}
                             />
                         ))}
+                        <div className="pt-2">
+                            <p className="text-[10px] font-bold text-neutral-600 mb-2 ml-1 uppercase tracking-widest">Ta propre réponse (facultatif) :</p>
+                            <input
+                                className="w-full bg-surface border border-border rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#FF1E1E] transition-colors"
+                                placeholder="Précise ta situation..."
+                                value={(answers[current.id + "_perso"] as string) ?? ""}
+                                onChange={e => setText(current.id + "_perso", e.target.value)}
+                            />
+                        </div>
                     </div>
                 )}
 
