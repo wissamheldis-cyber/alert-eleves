@@ -667,27 +667,27 @@ export default function AtelierStandalone() {
 
             <BgLayers />
 
-            {/* ── STAGE — fixe sur mobile, min-h sur desktop ── */}
-            <div className="relative z-[10] flex flex-col h-dvh md:min-h-screen md:h-auto overflow-hidden md:overflow-visible">
+            {/* ── STAGE ── */}
+            <div className="relative z-[10] flex flex-col min-h-screen">
 
                 {/* ── LOGO & TOP RIBBON ── */}
-                <div className="flex flex-col items-center pt-8 md:pt-20 pb-4 md:pb-10 shrink-0">
+                <div className="flex flex-col items-center pt-12 md:pt-20 pb-6 md:pb-10 shrink-0">
                     <img
                         src="/images/logo.png"
                         alt="Logo"
-                        className="w-10 md:w-14 h-auto mb-5 md:mb-10 brightness-0 drop-shadow-[0_0_8px_rgba(255,255,255,1)]"
+                        className="w-14 md:w-18 h-auto mb-8 md:mb-10 brightness-0 drop-shadow-[0_0_8px_rgba(255,255,255,1)]"
                     />
-                    <div className="w-full bg-[#CC0000] flex items-center justify-center h-9 md:h-11 shadow-[0_2px_45px_rgba(204,0,0,0.55)]">
-                        <span className="text-[9px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
+                    <div className="w-full bg-[#CC0000] flex items-center justify-center h-10 md:h-11 shadow-[0_2px_45px_rgba(204,0,0,0.55)]">
+                        <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
                     </div>
                 </div>
 
-                <div className="flex-1 flex items-center justify-center px-3 pb-3 md:pb-8 md:p-8 overflow-hidden">
-                    <div className="w-full max-w-2xl bg-[#08080C]/85 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_40px_120px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col" style={{ maxHeight: "calc(100dvh - 180px)" }}>
+                <div className="flex-1 flex items-start md:items-center justify-center px-3 pb-6 md:p-8">
+                    <div className="w-full max-w-2xl bg-[#08080C]/85 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_70px_180px_rgba(0,0,0,0.95)] overflow-hidden">
 
                         {/* Header Branding */}
-                        <div className="flex flex-col items-center justify-center px-6 py-5 md:py-10 border-b border-white/5 bg-white/[0.02] shrink-0">
-                            <h1 className="text-xl md:text-4xl font-black uppercase tracking-[0.4em] text-white text-center"
+                        <div className="flex flex-col items-center justify-center px-6 py-8 md:py-10 border-b border-white/5 bg-white/[0.02]">
+                            <h1 className="text-2xl md:text-4xl font-black uppercase tracking-[0.4em] text-white text-center"
                                 style={{ fontFamily: "var(--font-oswald, sans-serif)", textShadow: "0 0 30px rgba(255,255,255,0.4)" }}>
                                 Alert&apos;Élèves
                             </h1>
@@ -701,7 +701,7 @@ export default function AtelierStandalone() {
                         )}
 
                         {/* Body */}
-                        <div className="p-4 md:p-10 flex-1 overflow-hidden">
+                        <div className="p-5 md:p-10 min-h-[20rem]">
                             <div style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)", transition: "opacity 0.25s, transform 0.25s" }}>
                                 <div className="flex flex-col h-full">
                                         <div className="flex items-center justify-between mb-6">
