@@ -450,7 +450,7 @@ export default function AtelierStandalone() {
     const finalPhrase = (answers["phrase_finale_custom"] as string) || (answers["phrase_finale"] as string) || "";
     const contextTriggers = ([answers["contexte_detailed"]] as string[][]).flat().filter(Boolean);
 
-    // ─── BILAN ────────────────────────────────────────────────────────────────
+    // ─── BILAN (screenshot-friendly, même layout que le quiz) ───────────────
 
     if (isDone) {
         return (
@@ -459,182 +459,164 @@ export default function AtelierStandalone() {
                 {!isMobile && <CustomCursor cursorType={cursorType} />}
                 <style>{!isMobile ? `* { cursor: none !important; }` : ""}</style>
 
-                <div className="relative z-[10] flex flex-col min-h-screen">
+                {/* Layout fixe plein écran — centré sur mobile */}
+                <div className="relative z-[10] h-dvh flex flex-col overflow-hidden">
 
-                    {/* ── même header que le quiz ── */}
-                    <div className="flex flex-col items-center pt-12 md:pt-20 pb-6 md:pb-10 shrink-0">
-                        <img src="/images/logo.png" alt="Logo" className="w-14 md:w-18 h-auto mb-8 md:mb-10 brightness-0 drop-shadow-[0_0_8px_rgba(255,255,255,1)]" />
-                        <div className="w-full bg-[#CC0000] flex items-center justify-center h-10 md:h-11 shadow-[0_2px_45px_rgba(204,0,0,0.55)]">
-                            <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
+                    {/* Header identique au quiz */}
+                    <div className="flex flex-col items-center pt-8 md:pt-14 pb-4 md:pb-8 shrink-0">
+                        <img src="/images/logo.png" alt="Logo" className="w-10 md:w-14 h-auto mb-5 md:mb-8 brightness-0 drop-shadow-[0_0_8px_rgba(255,255,255,1)]" />
+                        <div className="w-full bg-[#CC0000] flex items-center justify-center h-9 md:h-11 shadow-[0_2px_45px_rgba(204,0,0,0.55)]">
+                            <span className="text-[9px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
                         </div>
                     </div>
 
-                    {/* ── même carte que le quiz ── */}
-                    <div className="flex-1 flex items-start md:items-center justify-center px-3 pb-6 md:p-8">
-                        <div className="w-full max-w-2xl bg-[#08080C]/85 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_70px_180px_rgba(0,0,0,0.95)] overflow-hidden">
+                    {/* Carte bilan — centrée, hauteur contrainte */}
+                    <div className="flex-1 flex items-center justify-center px-3 md:px-8 overflow-hidden">
+                        <div className="w-full max-w-2xl bg-[#08080C]/85 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_40px_120px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden" style={{ maxHeight: "calc(100dvh - 170px)" }}>
 
                             {/* En-tête carte */}
-                            <div className="flex flex-col items-center justify-center px-6 py-8 md:py-10 border-b border-white/5 bg-white/[0.02]">
-                                <h1 className="text-2xl md:text-4xl font-black uppercase tracking-[0.4em] text-white text-center"
-                                    style={{ fontFamily: "var(--font-oswald, sans-serif)", textShadow: "0 0 30px rgba(255,255,255,0.4)" }}>
+                            <div className="flex items-center justify-between px-5 md:px-8 py-4 md:py-6 border-b border-white/5 bg-white/[0.02] shrink-0">
+                                <h1 className="text-lg md:text-3xl font-black uppercase tracking-[0.35em] text-white"
+                                    style={{ fontFamily: "var(--font-oswald, sans-serif)", textShadow: "0 0 20px rgba(255,255,255,0.35)" }}>
                                     Alert&apos;Élèves
                                 </h1>
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#CC0000] mt-3">
-                                    {prenom ? `Bilan de ${prenom}` : "Mon bilan"}
+                                <p className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.4em] text-[#CC0000]">
+                                    {prenom ? `Bilan · ${prenom}` : "Mon bilan"}
                                 </p>
                             </div>
 
-                            {/* Barre pleine */}
-                            <div className="h-[2.5px] w-full bg-white/5">
-                                <div className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]" style={{ width: "100%" }} />
+                            {/* Barre 100% */}
+                            <div className="h-[2px] w-full bg-white/5 shrink-0">
+                                <div className="h-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)]" style={{ width: "100%" }} />
                             </div>
 
-                            {/* Corps scrollable */}
-                            <div className="p-5 md:p-10">
-                                <div className="overflow-y-auto custom-scrollbar space-y-4" style={{ maxHeight: "calc(100dvh - 380px)", minHeight: "200px" }}>
+                            {/* Contenu compact — NO SCROLL, tout tient en 1 vue */}
+                            <div className="flex-1 overflow-hidden px-4 md:px-8 py-4 md:py-6 flex flex-col gap-3">
 
-                                    {/* PHRASE HERO */}
-                                    {finalPhrase && (
-                                        <div className="relative overflow-hidden rounded-[1.5rem]">
-                                            <div className="absolute inset-0 bg-white/[0.04] backdrop-blur-sm" />
-                                            <div className="absolute inset-0 border border-white/15 rounded-[1.5rem]" />
-                                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-                                            <div className="relative px-6 py-7 md:px-8 md:py-8 text-center">
-                                                <p className="text-[9px] font-black uppercase tracking-[0.6em] text-white/40 mb-4">Ma phrase</p>
-                                                <p className="text-lg md:text-xl font-black italic text-white leading-snug"
-                                                    style={{ textShadow: "0 0 40px rgba(255,255,255,0.3)" }}>
-                                                    &ldquo;{finalPhrase}&rdquo;
-                                                </p>
-                                            </div>
-                                            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                                {/* PHRASE */}
+                                {finalPhrase && (
+                                    <div className="relative overflow-hidden rounded-2xl shrink-0">
+                                        <div className="absolute inset-0 bg-white/[0.04]" />
+                                        <div className="absolute inset-0 border border-white/12 rounded-2xl" />
+                                        <div className="absolute top-0 left-0 w-full h-[1.5px] bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+                                        <div className="relative px-4 py-3 md:px-6 md:py-4 text-center">
+                                            <p className="text-[8px] font-black uppercase tracking-[0.6em] text-white/35 mb-1.5">Ma phrase</p>
+                                            <p className="text-sm md:text-base font-black italic text-white leading-snug"
+                                                style={{ textShadow: "0 0 30px rgba(255,255,255,0.25)" }}>
+                                                &ldquo;{finalPhrase}&rdquo;
+                                            </p>
                                         </div>
-                                    )}
+                                    </div>
+                                )}
 
-                                    {/* OUTIL */}
+                                {/* OUTIL + DÉCLENCHEURS côte à côte sur md, empilés sur mobile */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 shrink-0">
                                     {selectedTool && (
-                                        <div className="bg-white/[0.03] border border-white/8 rounded-2xl overflow-hidden">
-                                            <div className="flex items-center gap-4 px-5 py-4 border-b border-white/5">
-                                                <div className="w-10 h-10 rounded-full bg-[#CC0000] flex items-center justify-center shrink-0 shadow-[0_0_18px_rgba(204,0,0,0.45)]">
-                                                    <span className="text-sm font-black text-white">{selectedTool.id}</span>
-                                                </div>
-                                                <div>
-                                                    <p className="text-[9px] font-black uppercase tracking-[0.45em] text-[#CC0000] mb-0.5">Mon outil</p>
-                                                    <p className="text-base font-black text-white leading-tight">{selectedTool.label}</p>
-                                                </div>
+                                        <div className="bg-white/[0.03] border border-white/8 rounded-xl p-3 md:p-4 flex items-center gap-3">
+                                            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#CC0000] flex items-center justify-center shrink-0 shadow-[0_0_14px_rgba(204,0,0,0.4)]">
+                                                <span className="text-xs font-black text-white">{selectedTool.id}</span>
                                             </div>
-                                            <div className="px-5 py-4 space-y-2">
-                                                <p className="text-sm text-neutral-400 leading-relaxed">{selectedTool.desc}</p>
-                                                <div className="h-px bg-white/5" />
-                                                <p className="text-[11px] italic text-neutral-600">{selectedTool.for}</p>
+                                            <div className="min-w-0">
+                                                <p className="text-[8px] font-black uppercase tracking-[0.4em] text-[#CC0000] mb-0.5">Mon outil</p>
+                                                <p className="text-sm font-black text-white leading-tight truncate">{selectedTool.label}</p>
+                                                <p className="text-[10px] text-neutral-500 leading-tight mt-0.5 line-clamp-1">{selectedTool.desc}</p>
                                             </div>
                                         </div>
                                     )}
-
-                                    {/* DÉCLENCHEURS */}
                                     {contextTriggers.length > 0 && (
-                                        <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5">
-                                            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/25 mb-3">Mes déclencheurs</p>
-                                            <div className="flex flex-wrap gap-2">
-                                                {contextTriggers.map(t => (
-                                                    <span key={t} className="px-3 py-1.5 bg-[#CC0000]/10 border border-[#CC0000]/20 rounded-full text-xs font-medium text-[#FF6666] leading-none">
+                                        <div className="bg-white/[0.03] border border-white/8 rounded-xl p-3 md:p-4">
+                                            <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25 mb-2">Déclencheurs</p>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {contextTriggers.slice(0, 4).map(t => (
+                                                    <span key={t} className="px-2 py-1 bg-[#CC0000]/10 border border-[#CC0000]/20 rounded-full text-[10px] font-medium text-[#FF6666] leading-none">
                                                         {t}
                                                     </span>
                                                 ))}
-                                                {(answers["contexte_detailed_perso"] as string) && (
-                                                    <span className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-neutral-400 italic leading-none">
-                                                        {answers["contexte_detailed_perso"] as string}
+                                                {contextTriggers.length > 4 && (
+                                                    <span className="px-2 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] text-neutral-500 leading-none">
+                                                        +{contextTriggers.length - 4}
                                                     </span>
                                                 )}
                                             </div>
                                         </div>
                                     )}
+                                </div>
 
-                                    {/* OBSTACLE + FRÉQUENCE */}
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {(answers["devenir"] as string) && (
-                                            <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-4">
-                                                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">Mon obstacle</p>
-                                                <p className="text-sm font-bold text-white leading-snug">{answers["devenir"] as string}</p>
-                                                {(answers["devenir_perso"] as string) && (
-                                                    <p className="text-xs text-neutral-500 mt-1 italic">{answers["devenir_perso"] as string}</p>
-                                                )}
-                                            </div>
-                                        )}
-                                        {(answers["frequence"] as string) && (
-                                            <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-4">
-                                                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">Fréquence</p>
-                                                <p className="text-sm font-medium text-neutral-300 leading-snug">{answers["frequence"] as string}</p>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* OBJECTIFS */}
-                                    {((answers["devenir_goal"] as string) || (answers["demain_action"] as string)) && (
-                                        <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5">
-                                            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/25 mb-3">Mon objectif</p>
-                                            <div className="space-y-3">
-                                                {(answers["devenir_goal"] as string) && (
-                                                    <div className="flex gap-3 items-start">
-                                                        <span className="w-1.5 h-1.5 mt-[7px] rounded-full bg-[#CC0000] shrink-0" />
-                                                        <p className="text-sm text-white font-medium leading-relaxed">{answers["devenir_goal"] as string}</p>
-                                                    </div>
-                                                )}
-                                                {(answers["demain_action"] as string) && (
-                                                    <div className="flex gap-3 items-start">
-                                                        <span className="w-1.5 h-1.5 mt-[7px] rounded-full bg-white/30 shrink-0" />
-                                                        <p className="text-sm text-neutral-400 leading-relaxed">{answers["demain_action"] as string}</p>
-                                                    </div>
-                                                )}
-                                            </div>
+                                {/* OBSTACLE + FRÉQUENCE + OBJECTIF */}
+                                <div className="grid grid-cols-3 gap-2 shrink-0">
+                                    {(answers["devenir"] as string) && (
+                                        <div className="bg-white/[0.03] border border-white/8 rounded-xl p-2.5 md:p-3">
+                                            <p className="text-[7px] font-black uppercase tracking-[0.3em] text-white/20 mb-1">Obstacle</p>
+                                            <p className="text-[10px] md:text-xs font-bold text-white leading-snug line-clamp-2">{answers["devenir"] as string}</p>
                                         </div>
                                     )}
+                                    {(answers["frequence"] as string) && (
+                                        <div className="bg-white/[0.03] border border-white/8 rounded-xl p-2.5 md:p-3">
+                                            <p className="text-[7px] font-black uppercase tracking-[0.3em] text-white/20 mb-1">Fréquence</p>
+                                            <p className="text-[10px] md:text-xs font-medium text-neutral-300 leading-snug line-clamp-2">{answers["frequence"] as string}</p>
+                                        </div>
+                                    )}
+                                    {(answers["devenir_goal"] as string) && (
+                                        <div className="bg-white/[0.03] border border-white/8 rounded-xl p-2.5 md:p-3">
+                                            <p className="text-[7px] font-black uppercase tracking-[0.3em] text-white/20 mb-1">Objectif</p>
+                                            <p className="text-[10px] md:text-xs font-medium text-white leading-snug line-clamp-2">{answers["devenir_goal"] as string}</p>
+                                        </div>
+                                    )}
+                                </div>
 
-                                    {/* CLÉS */}
-                                    <div className="border border-white/5 rounded-2xl px-5 py-4">
-                                        <div className="flex justify-between gap-2">
+                                {/* ACTION DU LENDEMAIN */}
+                                {(answers["demain_action"] as string) && (
+                                    <div className="bg-white/[0.03] border border-white/8 rounded-xl px-4 py-2.5 flex gap-3 items-center shrink-0">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-white/40 shrink-0" />
+                                        <p className="text-[10px] md:text-xs text-neutral-400 leading-snug">{answers["demain_action"] as string}</p>
+                                    </div>
+                                )}
+
+                                {/* CLÉS + RESSOURCES */}
+                                <div className="grid grid-cols-2 gap-2 shrink-0 mt-auto">
+                                    <div className="border border-white/5 rounded-xl px-3 py-2.5">
+                                        <div className="space-y-1">
                                             {["Automatisme ≠ Choix", "Nicotine ado ≠ Adulte", "Aérosol ≠ Air"].map(k => (
-                                                <p key={k} className="text-[9px] font-bold uppercase text-neutral-700 leading-tight text-center flex-1">{k}</p>
+                                                <p key={k} className="text-[8px] font-bold uppercase text-neutral-700 leading-tight">{k}</p>
                                             ))}
                                         </div>
                                     </div>
-
-                                    {/* RESSOURCES */}
-                                    <div>
-                                        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 mb-3 text-center">Si t&apos;as besoin</p>
-                                        <div className="grid grid-cols-3 gap-2">
+                                    <div className="flex flex-col gap-1.5">
+                                        <p className="text-[7px] font-black uppercase tracking-[0.4em] text-white/20 text-center">Si t&apos;as besoin</p>
+                                        <div className="grid grid-cols-3 gap-1">
                                             {["Infirmier·ère", "CPE", "3989"].map(r => (
-                                                <div key={r} className="bg-[#CC0000]/8 border border-[#CC0000]/20 rounded-xl py-3 px-2 text-center">
-                                                    <p className="text-xs font-black text-[#FF5555]">{r}</p>
+                                                <div key={r} className="bg-[#CC0000]/8 border border-[#CC0000]/20 rounded-lg py-1.5 px-1 text-center">
+                                                    <p className="text-[8px] font-black text-[#FF5555] leading-tight">{r}</p>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
-
                                 </div>
+
                             </div>
 
                             {/* Pied de carte */}
-                            <div className="flex justify-center px-5 md:px-8 py-6 bg-white/[0.03] border-t border-white/5">
+                            <div className="flex justify-center px-5 py-3 md:py-4 bg-white/[0.02] border-t border-white/5 shrink-0">
                                 <RippleButton
                                     onClick={() => { setStep(0); setAnswers({}); }}
                                     variant="ghost"
-                                    className="px-10 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest"
+                                    className="px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest"
                                     onMouseEnter={() => setCursorType("button")}
                                     onMouseLeave={() => setCursorType("default")}
                                 >
-                                    Recommencer depuis le début
+                                    Recommencer
                                 </RippleButton>
                             </div>
 
                         </div>
                     </div>
 
-                    {/* ── même footer que le quiz ── */}
-                    <div className="w-full bg-[#CC0000] shrink-0 flex items-center justify-center h-10 z-20 mt-8 shadow-[0_-2px_50px_rgba(204,0,0,0.5)]">
-                        <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
+                    {/* Footer identique */}
+                    <div className="w-full bg-[#CC0000] shrink-0 flex items-center justify-center h-9 md:h-10 z-20 shadow-[0_-2px_40px_rgba(204,0,0,0.5)]">
+                        <span className="text-[9px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
                     </div>
-                    <div className="w-full bg-black shrink-0 h-10 flex items-center justify-center border-t border-white/5 z-20">
-                        <span className="font-black text-[15px] text-white tracking-[0.4em]" style={{ fontFamily: "var(--font-orbitron, monospace)" }}>
+                    <div className="w-full bg-black shrink-0 h-9 md:h-10 flex items-center justify-center border-t border-white/5 z-20">
+                        <span className="font-black text-[13px] md:text-[15px] text-white tracking-[0.4em]" style={{ fontFamily: "var(--font-orbitron, monospace)" }}>
                             A.M. <span className="text-[#CC0000]">17</span>
                         </span>
                     </div>
@@ -685,27 +667,27 @@ export default function AtelierStandalone() {
 
             <BgLayers />
 
-            {/* ── STAGE ── */}
-            <div className="relative z-[10] flex flex-col min-h-screen">
+            {/* ── STAGE — fixe sur mobile, min-h sur desktop ── */}
+            <div className="relative z-[10] flex flex-col h-dvh md:min-h-screen md:h-auto overflow-hidden md:overflow-visible">
 
                 {/* ── LOGO & TOP RIBBON ── */}
-                <div className="flex flex-col items-center pt-12 md:pt-20 pb-6 md:pb-10 shrink-0">
+                <div className="flex flex-col items-center pt-8 md:pt-20 pb-4 md:pb-10 shrink-0">
                     <img
                         src="/images/logo.png"
                         alt="Logo"
-                        className="w-14 md:w-18 h-auto mb-8 md:mb-10 brightness-0 drop-shadow-[0_0_8px_rgba(255,255,255,1)]"
+                        className="w-10 md:w-14 h-auto mb-5 md:mb-10 brightness-0 drop-shadow-[0_0_8px_rgba(255,255,255,1)]"
                     />
-                    <div className="w-full bg-[#CC0000] flex items-center justify-center h-10 md:h-11 shadow-[0_2px_45px_rgba(204,0,0,0.55)]">
-                        <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
+                    <div className="w-full bg-[#CC0000] flex items-center justify-center h-9 md:h-11 shadow-[0_2px_45px_rgba(204,0,0,0.55)]">
+                        <span className="text-[9px] md:text-sm font-black uppercase tracking-[0.55em] text-white" style={{ fontFamily: "var(--font-league-spartan, sans-serif)" }}>Prévention</span>
                     </div>
                 </div>
 
-                <div className="flex-1 flex items-start md:items-center justify-center px-3 pb-6 md:p-8">
-                    <div className="w-full max-w-2xl bg-[#08080C]/85 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_70px_180px_rgba(0,0,0,0.95)] overflow-hidden">
+                <div className="flex-1 flex items-center justify-center px-3 pb-3 md:pb-8 md:p-8 overflow-hidden">
+                    <div className="w-full max-w-2xl bg-[#08080C]/85 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_40px_120px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col" style={{ maxHeight: "calc(100dvh - 180px)" }}>
 
                         {/* Header Branding */}
-                        <div className="flex flex-col items-center justify-center px-6 py-8 md:py-10 border-b border-white/5 bg-white/[0.02]">
-                            <h1 className="text-2xl md:text-4xl font-black uppercase tracking-[0.4em] text-white text-center"
+                        <div className="flex flex-col items-center justify-center px-6 py-5 md:py-10 border-b border-white/5 bg-white/[0.02] shrink-0">
+                            <h1 className="text-xl md:text-4xl font-black uppercase tracking-[0.4em] text-white text-center"
                                 style={{ fontFamily: "var(--font-oswald, sans-serif)", textShadow: "0 0 30px rgba(255,255,255,0.4)" }}>
                                 Alert&apos;Élèves
                             </h1>
@@ -719,7 +701,7 @@ export default function AtelierStandalone() {
                         )}
 
                         {/* Body */}
-                        <div className="p-5 md:p-10 min-h-[20rem]">
+                        <div className="p-4 md:p-10 flex-1 overflow-hidden">
                             <div style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)", transition: "opacity 0.25s, transform 0.25s" }}>
                                 <div className="flex flex-col h-full">
                                         <div className="flex items-center justify-between mb-6">
@@ -759,17 +741,19 @@ export default function AtelierStandalone() {
                                                                 );
                                                             })}
                                                         </div>
-                                                        <div className="mt-4">
-                                                            <p className="text-[10px] font-bold text-neutral-600 mb-2 ml-1 tracking-widest uppercase">Ta propre réponse (facultatif) :</p>
-                                                            <input
-                                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-white/30 transition-colors"
-                                                                placeholder="Précise ta situation..."
-                                                                value={(answers[current.id + "_perso"] as string) ?? ""}
-                                                                onChange={e => setText(current.id + "_perso", e.target.value)}
-                                                                onFocus={() => setCursorType("text")}
-                                                                onBlur={() => setCursorType("default")}
-                                                            />
-                                                        </div>
+                                                        {current.id !== "frequence" && (
+                                                            <div className="mt-4">
+                                                                <p className="text-[10px] font-bold text-neutral-600 mb-2 ml-1 tracking-widest uppercase">Ta propre réponse (facultatif) :</p>
+                                                                <input
+                                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-white/30 transition-colors"
+                                                                    placeholder="Précise ta situation..."
+                                                                    value={(answers[current.id + "_perso"] as string) ?? ""}
+                                                                    onChange={e => setText(current.id + "_perso", e.target.value)}
+                                                                    onFocus={() => setCursorType("text")}
+                                                                    onBlur={() => setCursorType("default")}
+                                                                />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
 
