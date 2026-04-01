@@ -490,8 +490,8 @@ export default function AtelierStandalone() {
                                 <div className="h-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)]" style={{ width: "100%" }} />
                             </div>
 
-                            {/* Contenu compact — NO SCROLL, tout tient en 1 vue */}
-                            <div className="flex-1 overflow-hidden px-4 md:px-8 py-4 md:py-6 flex flex-col gap-3">
+                            {/* Contenu compact — Scrollable sur mobile */}
+                            <div className="flex-1 overflow-y-auto custom-scrollbar px-4 md:px-8 py-4 md:py-6 flex flex-col gap-3">
 
                                 {/* PHRASE */}
                                 {finalPhrase && (
